@@ -1,0 +1,455 @@
+from pathlib import Path
+
+html = r'''<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ორგანიზმების საიდუმლოებები</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fira+GO:wght@400;500;600;700;800&display=swap');
+:root{
+ --green:#145b43;--deep:#0d4634;--mint:#e9f5e9;--cream:#fff9e9;
+ --gold:#ffc95c;--ink:#203b30;--muted:#718278;--line:#e1ecdf;
+ --shadow:0 12px 32px rgba(28,75,49,.10);
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Fira GO","Arial",sans-serif;background:#f1f7ef;color:var(--ink)}
+button,input,select{font:inherit}
+button{cursor:pointer;border:0;border-radius:14px;padding:12px 17px;font-weight:700;transition:.2s}
+button:hover{transform:translateY(-2px);filter:brightness(1.03)}
+header{position:sticky;top:0;z-index:10;background:linear-gradient(100deg,#0d4936,#197451);color:white;padding:13px max(4%,calc((100% - 1280px)/2));display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;box-shadow:0 5px 20px #123d2a25}
+.logo{font-size:20px;font-weight:800;letter-spacing:.1px}
+nav{display:flex;gap:7px;flex-wrap:wrap}
+nav button{background:#ffffff18;color:white;padding:10px 14px}
+nav button.active,nav button:hover{background:var(--gold);color:#244333}
+.page{display:none;max-width:1280px;margin:auto;padding:26px 18px 60px}
+.page.active{display:block}
+.hero{position:relative;overflow:hidden;min-height:350px;border-radius:30px;padding:42px;background:linear-gradient(100deg,rgba(12,71,51,.94),rgba(24,117,77,.76)),url('https://images.unsplash.com/photo-1472396961693-142e6e269027?auto=format&fit=crop&w=1600&q=85') center/cover;color:white;display:flex;align-items:center;justify-content:space-between;gap:25px;box-shadow:var(--shadow)}
+.hero:after{content:"🌿";position:absolute;right:4%;bottom:-35px;font-size:190px;opacity:.25;transform:rotate(-15deg)}
+.hero-copy{position:relative;z-index:1;max-width:700px}
+.hero h1{font-size:clamp(36px,5vw,62px);line-height:1.12;margin:15px 0}
+.hero p{font-size:18px;line-height:1.8;max-width:650px}
+.hero-art{position:relative;z-index:1;font-size:clamp(80px,12vw,145px);filter:drop-shadow(0 10px 10px #1235)}
+.tag{display:inline-block;background:#fff1c9;color:#75551b;padding:7px 13px;border-radius:30px;font-size:13px;font-weight:800}
+.primary{background:linear-gradient(135deg,#ffda79,#ffbd45);color:#31452f;box-shadow:0 5px 12px #a7792520}
+.secondary{background:#e4f2e5;color:#18583f}
+.danger{background:#ffe5df;color:#973d32}
+h2.section{color:var(--green);font-size:30px;margin:28px 0 8px}
+.muted{color:var(--muted);line-height:1.65}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:17px;margin:20px 0}
+.card,.panel{background:white;border:1px solid var(--line);border-radius:22px;padding:20px;box-shadow:var(--shadow)}
+.card{overflow:hidden}
+.card h3,.panel h3{color:var(--green);margin:9px 0}
+.card p,.panel p,.panel li{line-height:1.7}
+.emoji{font-size:45px}
+.fact{background:#fff5d9;border-left:4px solid #f0c45a;padding:13px 15px;border-radius:13px;margin-top:12px;line-height:1.65}
+.controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:13px 0}
+input,select{padding:12px 13px;border:2px solid #dce9dd;border-radius:12px;background:white;max-width:100%;color:var(--ink)}
+input:focus,select:focus{outline:3px solid #bfe4c5;border-color:#68a77c}
+.board-wrap{padding:20px;background:linear-gradient(135deg,#dff1df,#fff3d9);border-radius:25px;box-shadow:var(--shadow)}
+.board{display:grid;grid-template-columns:repeat(6,1fr);gap:9px}
+.cell{min-height:92px;border:3px solid white;border-radius:16px;padding:8px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 4px 10px #244b2518;overflow:hidden}
+.cell b{font-size:20px}.cell small{font-size:11px;font-weight:700;line-height:1.3}
+.blue{background:#d5eaff}.yellow{background:#fff1b9}.green{background:#d2efd5}.red{background:#ffded9}.purple{background:#eaddff}.teal{background:#d3f3ef}.orange{background:#ffe4c8}
+.start{background:#c5f0d1}.finish{background:#ffdc83}.special{outline:3px dashed #a77939;outline-offset:-6px}
+.pawns{font-size:19px;line-height:1.2}.pawn{display:inline-block;animation:bob 1s infinite alternate}
+@keyframes bob{to{transform:translateY(-4px)}}
+.team-list,.badges{display:flex;gap:8px;flex-wrap:wrap}
+.team-pill{padding:9px 12px;background:white;border:2px solid #ddd;border-radius:13px;font-weight:700}
+.team-pill.current{background:#fff4cf;border-color:#e6b83c}
+.dice{font-size:42px;background:#fff;border-radius:16px;padding:5px 18px;box-shadow:0 4px 13px #0001}
+.score-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
+.score-card{background:white;border-radius:19px;padding:18px;border-top:6px solid var(--c);box-shadow:var(--shadow)}
+.score{font-size:36px;color:#176b50;font-weight:900}
+.modal{display:none;position:fixed;inset:0;background:#102d25d9;z-index:30;align-items:center;justify-content:center;padding:15px}
+.modal.show{display:flex}
+.modalbox{background:#fffdf6;border-radius:25px;padding:25px;max-width:720px;width:100%;max-height:92vh;overflow:auto;box-shadow:0 18px 60px #0005}
+.question-image{width:100%;max-height:230px;object-fit:cover;border-radius:17px;margin:12px 0}
+.answer{display:none;background:#e8f5e9;padding:16px;border-radius:15px;margin-top:13px;line-height:1.7;border-left:5px solid #63a875}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.good{background:#c9edce;color:#155638}.great{background:#ffdf88;color:#634500}.neutral{background:#e8e9e7;color:#45554b}
+.timer{font-size:32px;font-weight:900;color:#b74b38}
+.badge{background:#fff2c8;padding:10px 13px;border-radius:13px;font-weight:700}
+.progress{height:9px;background:#e9eee8;border-radius:10px;overflow:hidden}.progress span{display:block;height:100%;background:#55a875}
+.gallery-card{padding:0;overflow:hidden}.gallery-card img{width:100%;height:155px;object-fit:cover;display:block}.gallery-card .inside{padding:15px}
+.gallery-card a{color:#176b50;font-weight:800;text-decoration:none}.gallery-card a:hover{text-decoration:underline}
+.topic-img{width:100%;height:165px;object-fit:cover;border-radius:15px;margin:10px 0}
+.match-item{padding:12px 15px;background:#edf5e9;border-radius:12px;margin:6px;display:inline-block;cursor:pointer;border:2px solid transparent}
+.match-item.selected{border-color:#e2ad37;background:#fff3c8}
+.certificate{background:#fffdf0;border:9px double #bd9b43;padding:35px;text-align:center;border-radius:15px;color:#31513b}
+.certificate h2{font-size:32px;color:#946d23}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:50;overflow:hidden}
+.conf{position:absolute;top:-20px;font-size:22px;animation:fall 2.5s linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(700deg);opacity:0}}
+footer{text-align:center;padding:28px;color:#718278}
+@media(max-width:760px){header{justify-content:center}.hero{padding:28px 22px;flex-direction:column;text-align:center}.hero-art{font-size:80px}.board{grid-template-columns:repeat(5,1fr);gap:5px}.cell{min-height:76px;padding:5px}.cell small{font-size:9px}.page{padding:18px 12px 45px}nav{justify-content:center}}
+@media print{body *{visibility:hidden}.certificate,.certificate *{visibility:visible}.certificate{position:absolute;inset:0;margin:20px}}
+</style>
+</head>
+<body>
+<div id="confetti"></div>
+<header>
+ <div class="logo">🌿 ორგანიზმების საიდუმლოებები</div>
+ <nav>
+  <button class="active" onclick="page('home',this)">🏡 მთავარი</button>
+  <button onclick="page('knowledge',this)">📚 ცოდნის კუთხე</button>
+  <button onclick="page('rules',this)">📖 წესები</button>
+  <button onclick="page('game',this)">🎲 თამაში</button>
+  <button onclick="page('scores',this)">🏆 ჯილდოები</button>
+ </nav>
+</header>
+
+<main id="home" class="page active">
+ <section class="hero">
+  <div class="hero-copy">
+   <span class="tag">საგანმანათლებლო თავგადასავალი</span>
+   <h1>აღმოაჩინე ცოცხალი სამყაროს საიდუმლოებები!</h1>
+   <p>გამოიკვლიე ბუნება, გაიცანი საოცარი ორგანიზმები, ამოხსენი გამოცანები და დაეხმარე შენს გუნდს გამარჯვებაში!</p>
+   <button class="primary" onclick="page('knowledge')">ჯერ შევისწავლოთ 📚</button>
+   <button class="secondary" onclick="page('game')">თამაშის დაწყება 🎲</button>
+  </div>
+  <div class="hero-art">🌳🦊🦋</div>
+ </section>
+ <h2 class="section">აირჩიე შენი თავგადასავალი!</h2>
+ <div class="cards">
+  <div class="card"><div class="emoji">📚</div><h3>შეისწავლე</h3><p>გაეცანი ცოცხალი სამყაროს ძირითად თემებს, ნახე ფოტოები და საინტერესო ფაქტები.</p></div>
+  <div class="card"><div class="emoji">🎲</div><h3>ითამაშე</h3><p>გააგორე კამათელი, იმოძრავე ბილიკზე და შეასრულე სხვადასხვა ტიპის დავალება.</p></div>
+  <div class="card"><div class="emoji">🏅</div><h3>მოიპოვე ბეჯები</h3><p>დააგროვე ქულები, გახდი ცოდნის მკვლევარი და მიიღე ჯილდოები.</p></div>
+  <div class="card"><div class="emoji">🏆</div><h3>გაიმარჯვე</h3><p>აჩვენე გუნდური მუშაობა, ცოდნა და შემოქმედებითი აზროვნება.</p></div>
+ </div>
+</main>
+
+<section id="knowledge" class="page">
+ <h2 class="section">📚 ცოდნის კუთხე</h2>
+ <p class="muted">წაიკითხე მოკლე განმარტებები, დააკვირდი ფოტოებს და გაიხსენე მთავარი ინფორმაცია.</p>
+ <div class="cards">
+  <article class="card"><div class="emoji">🌍</div><h3>1. ორგანიზმების კლასიფიკაცია</h3><img class="topic-img" src="https://images.unsplash.com/photo-1472396961693-142e6e269027?auto=format&fit=crop&w=700&q=80" alt="ტყის ცოცხალი სამყარო"><p>ცოცხალ ორგანიზმებს მსგავსებისა და განსხვავებების მიხედვით აჯგუფებენ. ასე მეცნიერები მრავალფეროვან ცოცხალ სამყაროს უფრო ადვილად სწავლობენ. სასკოლო დონეზე განვიხილავთ ბაქტერიებს, სოკოებს, მცენარეებსა და ცხოველებს.</p><div class="fact">💡 კლასიფიკაცია ორგანიზმების მოწესრიგებასა და შედარებაში გვეხმარება.</div></article>
+  <article class="card"><div class="emoji">🦠</div><h3>2. ბაქტერიები</h3><img class="topic-img" src="https://images.unsplash.com/photo-1579154204601-01588f351e67?auto=format&fit=crop&w=700&q=80" alt="მიკროსკოპული სამყარო"><p>ბაქტერიები უმეტესად ერთუჯრედიანი, მიკროსკოპული ორგანიზმებია. ისინი გვხვდებიან ნიადაგში, წყალში, ჰაერსა და სხვა ორგანიზმებში. ზოგი სასარგებლოა, ზოგი კი დაავადებას იწვევს.</p><div class="fact">💡 სასარგებლო ბაქტერიები მონაწილეობენ საკვების მონელებასა და ზოგი პროდუქტის დამზადებაში.</div></article>
+  <article class="card"><div class="emoji">🍄</div><h3>3. სოკოები</h3><img class="topic-img" src="https://images.unsplash.com/photo-1504545102780-26774c1bb073?auto=format&fit=crop&w=700&q=80" alt="ტყის სოკოები"><p>სოკოები ცოცხალი ორგანიზმების დამოუკიდებელი ჯგუფია. მათ მიეკუთვნება ქუდიანი სოკო, ობი და საფუარი. სოკოები მზა ორგანული ნივთიერებებით იკვებებიან.</p><div class="fact">💡 ყველა სოკო საკვებად ვარგისი არ არის. უცნობი სოკო არასოდეს გასინჯო!</div></article>
+  <article class="card"><div class="emoji">🌱</div><h3>4. მცენარეები</h3><img class="topic-img" src="https://images.unsplash.com/photo-1497250681960-ef046c08a56e?auto=format&fit=crop&w=700&q=80" alt="მწვანე მცენარე"><p>მცენარეების უმეტესობა ფოტოსინთეზის გზით თავად წარმოქმნის საკვებს. ამისთვის მათ სჭირდებათ სინათლე, წყალი და ჰაერიდან მიღებული ნახშირორჟანგი. ფესვი, ღერო და ფოთოლი მცენარის ძირითადი ორგანოებია.</p><div class="fact">💡 ფესვი წყალსა და მინერალურ ნივთიერებებს იწოვს, ღერო კი მათ გადაადგილებაში ეხმარება.</div></article>
+  <article class="card"><div class="emoji">🌲🌸</div><h3>5. წიწვოვანი და ყვავილოვანი მცენარეები</h3><img class="topic-img" src="https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=700&q=80" alt="წიწვოვანი ტყე"><p>წიწვოვან მცენარეებს ხშირად ნემსისებრი ფოთლები და გირჩები აქვთ. ყვავილოვანი მცენარეები ყვავილს წარმოქმნიან, ხოლო მათი თესლი ნაყოფში ვითარდება.</p><div class="fact">💡 ფიჭვი და ნაძვი წიწვოვანია; ვაშლი და ვარდი — ყვავილოვანი.</div></article>
+  <article class="card"><div class="emoji">🦋🐟</div><h3>6. ხერხემლიანი და უხერხემლო ცხოველები</h3><img class="topic-img" src="https://images.unsplash.com/photo-150 levi?auto=format&fit=crop&w=700&q=80" alt="ცხოველები"><p>ხერხემლიან ცხოველებს ხერხემალი აქვთ, უხერხემლოებს კი — არა. ხერხემლიანებია თევზები, ამფიბიები, ქვეწარმავლები, ფრინველები და ძუძუმწოვრები. უხერხემლოებია მწერები, ობობები და მოლუსკები.</p><div class="fact">💡 პეპელა უხერხემლოა, ძაღლი კი — ხერხემლიანი.</div></article>
+  <article class="card"><div class="emoji">🦴</div><h3>7. ხერხემლიანი ცხოველების ჩონჩხი</h3><img class="topic-img" src="https://images.unsplash.com/photo-1535338454770-8be927b5a00b?auto=format&fit=crop&w=700&q=80" alt="ცხოველის ჩონჩხის ილუსტრაცია"><p>ჩონჩხი სხეულს ფორმას აძლევს, საყრდენს ქმნის, შინაგან ორგანოებს იცავს და მოძრაობაში მონაწილეობს. თავის ქალა ტვინს იცავს, ნეკნები კი გულსა და ფილტვებს.</p><div class="fact">💡 კუნთები ძვლებთან ერთად მოძრაობის შესრულებაში გვეხმარება.</div></article>
+  <article class="card"><div class="emoji">🌳🍄</div><h3>8. სოკოების მნიშვნელობა ბუნებაში</h3><img class="topic-img" src="https://images.unsplash.com/photo-1518977676601-b53f82aba655?auto=format&fit=crop&w=700&q=80" alt="სოკო ტყეში"><p>სოკოები შლიან მკვდარ მცენარეულ და ცხოველურ ნარჩენებს. ამ პროცესით ნივთიერებები გარემოში ბრუნდება. ზოგი სოკო საკვებად და მედიკამენტების წარმოებაშიც გამოიყენება.</p><div class="fact">💡 სოკოები ეკოსისტემაში ნივთიერებათა წრებრუნვის მნიშვნელოვანი მონაწილეები არიან.</div></article>
+  <article class="card"><div class="emoji">🐟🐸</div><h3>9. ხერხემლიანების ძირითადი ჯგუფები</h3><img class="topic-img" src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=700&q=80" alt="ბუნების მრავალფეროვნება"><p>ხერხემლიანებს მიეკუთვნება თევზები, ამფიბიები, ქვეწარმავლები, ფრინველები და ძუძუმწოვრები. ისინი განსხვავდებიან სხეულის აგებულებით, გადაადგილებითა და გარემოსთან შეგუებით.</p><div class="fact">💡 ბაყაყი ამფიბიაა, კუ — ქვეწარმავალი, დელფინი კი — ძუძუმწოვარი.</div></article>
+  <article class="card"><div class="emoji">🌼</div><h3>10. მცენარის ნაწილები და მათი ფუნქციები</h3><img class="topic-img" src="https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?auto=format&fit=crop&w=700&q=80" alt="მცენარეები"><p>ფესვი ამაგრებს მცენარეს და წყალს იწოვს; ღერო საყრდენია და ნივთიერებების გადაადგილებას უწყობს ხელს; ფოთოლში ძირითადად მიმდინარეობს ფოტოსინთეზი; ყვავილი გამრავლებაში მონაწილეობს.</p><div class="fact">💡 მცენარის თითოეულ ნაწილს თავისი მნიშვნელოვანი ფუნქცია აქვს.</div></article>
+  <article class="card"><div class="emoji">🌎</div><h3>11. ცოცხალი ორგანიზმები და გარემო</h3><img class="topic-img" src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=700&q=80" alt="ბუნებრივი გარემო"><p>ორგანიზმები ცხოვრობენ სხვადასხვა გარემოში: ტყეში, მდელოზე, წყალში, უდაბნოსა თუ ნიადაგში. თითოეული მათგანი გარემოს პირობებს არის შეგუებული.</p><div class="fact">💡 წყალი, სინათლე, ჰაერი და ტემპერატურა ცოცხალი ორგანიზმების ცხოვრებაზე მოქმედებს.</div></article>
+  <article class="card"><div class="emoji">🦋🌺</div><h3>12. ორგანიზმების მრავალფეროვნება და დაცვა</h3><img class="topic-img" src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=700&q=80" alt="ტყე"><p>დედამიწაზე უამრავი სახეობის ორგანიზმი ცხოვრობს. ბუნების დაცვა ნიშნავს მათი საცხოვრებელი გარემოს შენარჩუნებას, დაბინძურების შემცირებასა და ცოცხალი არსებების გაფრთხილებას.</p><div class="fact">💡 ბუნების დაცვა თითოეული ჩვენგანის პასუხისმგებლობაა.</div></article>
+ </div>
+
+ <div class="panel">
+  <h3>🧩 მინი-თამაში: დაახარისხე ცხოველები</h3>
+  <p>დააკვირდი ცხოველს და აირჩიე, ხერხემლიანია თუ უხერხემლო.</p>
+  <div id="matchAnimal" class="emoji">🐶</div><h3 id="matchName">ძაღლი</h3>
+  <div class="controls"><button class="secondary" onclick="matchAnswer('ხერხემლიანი')">ხერხემლიანი</button><button class="secondary" onclick="matchAnswer('უხერხემლო')">უხერხემლო</button></div>
+  <p id="matchFeedback">მზად ხარ? დაიწყე!</p><button class="primary" onclick="nextMatch()">შემდეგი ცხოველი →</button>
+  <p id="matchScore">სწორი პასუხები: 0</p>
+ </div>
+
+ <div class="panel">
+  <h3>📸 ცოცხალი სამყაროს გალერეა</h3>
+  <p class="muted">დააჭირე „ფოტოების ნახვას“ და დაათვალიერე შესაბამისი თემის სურათები. ბმულები Wikimedia Commons-ის კატეგორიებზე გადაგიყვანს.</p>
+  <div class="cards">
+   <div class="card gallery-card"><img src="https://images.unsplash.com/photo-1579154204601-01588f351e67?auto=format&fit=crop&w=700&q=80" alt="ბაქტერიები"><div class="inside"><h3>🦠 ბაქტერიები</h3><a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/Category:Bacteria">ფოტოების ნახვა ↗</a></div></div>
+   <div class="card gallery-card"><img src="https://images.unsplash.com/photo-1504545102780-26774c1bb073?auto=format&fit=crop&w=700&q=80" alt="სოკოები"><div class="inside"><h3>🍄 სოკოები და ობი</h3><a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/Category:Fungi">ფოტოების ნახვა ↗</a></div></div>
+   <div class="card gallery-card"><img src="https://images.unsplash.com/photo-1497250681960-ef046c08a56e?auto=format&fit=crop&w=700&q=80" alt="მცენარეები"><div class="inside"><h3>🌱 მცენარეები</h3><a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/Category:Plants">ფოტოების ნახვა ↗</a></div></div>
+   <div class="card gallery-card"><img src="https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=700&q=80" alt="წიწვოვანი ტყე"><div class="inside"><h3>🌲 წიწვოვანი მცენარეები</h3><a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/Category:Conifers">ფოტოების ნახვა ↗</a></div></div>
+   <div class="card gallery-card"><img src="https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=700&q=80" alt="ყვავილები"><div class="inside"><h3>🌸 ყვავილოვანი მცენარეები</h3><a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/Category:Flowering_plants">ფოტოების ნახვა ↗</a></div></div>
+   <div class="card gallery-card"><img src="https://images.unsplash.com/photo-150 animal?auto=format&fit=crop&w=700&q=80" alt="ცხოველები"><div class="inside"><h3>🐾 ცხოველები</h3><a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/Category:Animals">ფოტოების ნახვა ↗</a></div></div>
+   <div class="card gallery-card"><img src="https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=700&q=80" alt="წყლის სამყარო"><div class="inside"><h3>🐟 წყლის ორგანიზმები</h3><a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/Category:Aquatic_organisms">ფოტოების ნახვა ↗</a></div></div>
+   <div class="card gallery-card"><img src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=700&q=80" alt="ეკოსისტემა"><div class="inside"><h3>🌳 საცხოვრებელი გარემო</h3><a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/Category:Ecosystems">ფოტოების ნახვა ↗</a></div></div>
+   <div class="card gallery-card"><img src="https://images.unsplash.com/photo-1535338454770-8be927b5a00b?auto=format&fit=crop&w=700&q=80" alt="ჩონჩხი"><div class="inside"><h3>🦴 ჩონჩხი და ძვლები</h3><a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/Category:Skeletons">ფოტოების ნახვა ↗</a></div></div>
+   <div class="card gallery-card"><img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=700&q=80" alt="ტყის დაცვა"><div class="inside"><h3>🌍 ბუნების დაცვა</h3><a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/Category:Nature_conservation">ფოტოების ნახვა ↗</a></div></div>
+  </div>
+ </div>
+</section>
+
+<section id="rules" class="page">
+ <h2 class="section">📖 როგორ ვითამაშოთ?</h2>
+ <p class="muted">თამაშის დაწყებამდე ერთად წაიკითხეთ წესები. თითოეულ გუნდს შეუძლია მოიფიქროს სახელი და აირჩიოს თავისი ცხოველი.</p>
+ <div class="cards">
+  <div class="card"><div class="emoji">👥</div><h3>1. შექმენით გუნდები</h3><p>თამაშში მონაწილეობს 2–8 გუნდი. თითოეულმა გუნდმა უნდა აირჩიოს სახელი და ცხოველ-პერსონაჟი. გუნდები თამაშობენ რიგრიგობით.</p></div>
+  <div class="card"><div class="emoji">🎲</div><h3>2. გააგორეთ კამათელი</h3><p>როცა თქვენი გუნდის ჯერია, დააჭირეთ „გააგორე კამათელი“. თქვენი ფიგურა იმდენი უჯრით გადაადგილდება, რამდენსაც კამათელი აჩვენებს.</p></div>
+  <div class="card"><div class="emoji">🧠</div><h3>3. შეასრულეთ დავალება</h3><p>უჯრის ფერის მიხედვით მიიღებთ კითხვას, გამოცანას ან შემოქმედებით დავალებას. ყურადღებით მოუსმინეთ მასწავლებელს და გუნდთან ერთად მოიფიქრეთ პასუხი.</p></div>
+  <div class="card"><div class="emoji">⏱️</div><h3>4. დაიცავით დრო</h3><p>პასუხის მოსაფიქრებლად გაქვთ 30 წამი. საჭიროების შემთხვევაში მასწავლებელს შეუძლია ტაიმერის თავიდან ჩართვა.</p></div>
+  <div class="card"><div class="emoji">⭐</div><h3>5. მიიღეთ ქულები</h3><p>სწორი პასუხი — 1 ქულა. სწორი პასუხი დასაბუთებით — 2 ქულა. თუ პასუხი არასწორია, ქულა არ ემატება. საბოლოო შეფასებას მასწავლებელი აკეთებს.</p></div>
+  <div class="card"><div class="emoji">🏆</div><h3>6. გახდით გამარჯვებული</h3><p>თამაშის ბოლოს შეადარეთ გუნდების ქულები. ყველაზე მეტი ქულის მქონე გუნდი მიიღებს ახალგაზრდა ბიოლოგის სერტიფიკატს.</p></div>
+ </div>
+ <div class="panel">
+  <h3>🎨 რას ნიშნავს უჯრების ფერები?</h3>
+  <div class="cards">
+   <div class="card blue">🔵 <b>ცოდნის კითხვა</b><p>გაიხსენე შესწავლილი ინფორმაცია და უპასუხე კითხვას.</p></div>
+   <div class="card yellow">🟡 <b>„ვინ ვარ მე?“</b><p>გამოიცანი ორგანიზმი მინიშნებების მიხედვით.</p></div>
+   <div class="card green">🟢 <b>სიტუაციური დავალება</b><p>იფიქრე, როგორ მოიქცეოდი მოცემულ სიტუაციაში.</p></div>
+   <div class="card red">🔴 <b>სწორია თუ არასწორია?</b><p>შეაფასე წინადადება და ახსენი შენი არჩევანი.</p></div>
+   <div class="card purple">🟣 <b>შემოქმედებითი დავალება</b><p>შეადარე, აღწერე ან მოიფიქრე საკუთარი მაგალითი.</p></div>
+   <div class="card teal">🩵 <b>საიდუმლო დავალება</b><p>შეასრულე მოკლე გამოწვევა ან დაუსვი კითხვა სხვა გუნდს.</p></div>
+   <div class="card orange">🟠 <b>ბონუსი</b><p>უპასუხე დამატებით კითხვას და მოიპოვე ქულა.</p></div>
+  </div>
+  <h3>🎁 სპეციალური უჯრები</h3>
+  <p>🚀 <b>სწრაფი ლიფტი</b> — ორი უჯრით წინ გადაინაცვლებ.</p>
+  <p>🍌 <b>ბანანის ქერქი</b> — ერთი უჯრით უკან დაბრუნდები.</p>
+  <p>🎁 <b>საიდუმლო სკივრი</b> — შემდეგ სწორ პასუხზე ორმაგ ქულას მიიღებ.</p>
+  <div class="fact">🤝 <b>გახსოვდეს:</b> მოუსმინე თანაგუნდელებს, არ შეაწყვეტინო სხვას საუბარი და პატივი ეცი ყველა გუნდის პასუხს. მთავარია არა მხოლოდ გამარჯვება, არამედ ერთად სწავლა!</div>
+ </div>
+</section>
+
+<section id="game" class="page">
+ <h2 class="section">🌳 სათამაშო სივრცე</h2>
+ <div class="panel">
+  <h3>🎨 აირჩიე სათამაშო სამყარო</h3>
+  <div class="controls"><select id="theme" onchange="changeTheme()"><option value="jungle">🌴 ჯუნგლების ბილიკი</option><option value="ocean">🌊 წყალქვეშა სამყარო</option><option value="lab">🔬 მიკროსამყარო</option></select><label><input type="checkbox" id="soundOn" checked> ხმოვანი ეფექტები</label></div>
+  <h3>👥 შექმენი გუნდები</h3>
+  <div class="controls"><input id="teamName" placeholder="გუნდის სახელი" maxlength="22"><select id="animal"><option value="🦁">🦁 ლომი</option><option value="🐸">🐸 ბაყაყი</option><option value="🦊">🦊 მელა</option><option value="🐼">🐼 პანდა</option><option value="🐢">🐢 კუ</option><option value="🦋">🦋 პეპელა</option><option value="🐬">🐬 დელფინი</option><option value="🐻">🐻 დათვი</option></select><button class="primary" onclick="addTeam()">+ გუნდის დამატება</button><button class="danger" onclick="resetGame()">თავიდან დაწყება</button></div>
+  <p id="teamCount">გუნდები: 0 / 8</p><div class="team-list" id="teams"></div>
+ </div>
+ <div class="panel">
+  <h3>🎲 კამათელი და სვლა</h3>
+  <div class="controls"><div class="dice" id="dice">⚄</div><button class="primary" onclick="rollDice()">გააგორე კამათელი</button><button class="secondary" onclick="nextTurn()">შემდეგი გუნდი →</button><span id="turnText">ჯერ დაამატეთ გუნდები.</span></div>
+  <div class="controls"><span class="timer" id="timer">00:30</span><button class="secondary" onclick="startTimer()">⏱️ ტაიმერის დაწყება</button><button class="secondary" onclick="stopTimer()">შეჩერება</button><button class="secondary" onclick="resetTimer()">განულება</button></div>
+ </div>
+ <div class="board-wrap"><h3>🗺️ სათავგადასავლო ბილიკი</h3><div class="board" id="board"></div><p class="muted">🚀 სწრაფი ლიფტი · 🍌 ბანანის ქერქი · 🎁 საიდუმლო სკივრი</p></div>
+ <div class="panel"><h3>🏅 თქვენი მიღწევები</h3><div class="badges" id="badges"><span class="muted">თამაშის დაწყების შემდეგ გამოჩნდება მიღწევები.</span></div></div>
+</section>
+
+<section id="scores" class="page">
+ <h2 class="section">🏆 ქულები და ჯილდოები</h2>
+ <div id="scoreBoard" class="score-grid"></div>
+ <div class="panel"><h3>🎓 ახალგაზრდა ბიოლოგის სერტიფიკატი</h3><p>ჩაწერეთ გამარჯვებული გუნდის ზუსტი სახელი და შექმენით სერტიფიკატი.</p><div class="controls"><input id="certName" placeholder="გამარჯვებული გუნდი"><button class="primary" onclick="makeCertificate()">სერტიფიკატის შექმნა</button></div><div id="certificateArea"></div></div>
+</section>
+
+<footer>🌱 ისწავლე · გამოიკვლიე · ითამაშე · გაიმარჯვე!</footer>
+
+<div class="modal" id="questionModal">
+ <div class="modalbox">
+  <span class="tag" id="categoryLabel">დავალება</span>
+  <h2 id="questionTitle">თქვენი დავალება</h2>
+  <img id="questionImage" class="question-image" src="" alt="კითხვის თემის ფოტო" style="display:none">
+  <p id="questionText" style="font-size:19px;line-height:1.7"></p>
+  <div class="controls"><span class="timer" id="questionTimer">00:30</span><button class="secondary" onclick="startTimer()">ტაიმერის დაწყება</button></div>
+  <button class="secondary" onclick="revealAnswer()">სწორი პასუხისა და ახსნის ნახვა</button>
+  <div class="answer" id="answerBox"><h3>✅ სწორი პასუხი</h3><p id="answerText"></p><p><b>რატომ არის ეს სწორი?</b> <span id="explanationText"></span></p></div>
+  <div class="btnrow"><button class="good" onclick="award(1)">სწორი პასუხი +1</button><button class="great" onclick="award(2)">სწორი და დასაბუთებული +2</button><button class="neutral" onclick="award(0)">ქულა არ ემატება</button><button class="danger" onclick="closeModal()">დახურვა</button></div>
+ </div>
+</div>
+
+<script>
+const colors=['#e75b54','#438ed0','#e6a83e','#8062b5','#319b72','#d875a5','#6583a8','#9b9848'];
+const categories=[['ცოდნის კითხვა','blue','🔵'],['ვინ ვარ მე?','yellow','🟡'],['სიტუაციური დავალება','green','🟢'],['სწორია თუ არასწორია?','red','🔴'],['შემოქმედებითი დავალება','purple','🟣'],['საიდუმლო დავალება','teal','🩵'],['ბონუს დავალება','orange','🟠']];
+const img={
+ bacteria:'https://images.unsplash.com/photo-1579154204601-01588f351e67?auto=format&fit=crop&w=900&q=80',
+ fungi:'https://images.unsplash.com/photo-1504545102780-26774c1bb073?auto=format&fit=crop&w=900&q=80',
+ plant:'https://images.unsplash.com/photo-1497250681960-ef046c08a56e?auto=format&fit=crop&w=900&q=80',
+ flower:'https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=900&q=80',
+ forest:'https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=900&q=80',
+ animal:'https://images.unsplash.com/photo-1472396961693-142e6e269027?auto=format&fit=crop&w=900&q=80',
+ fish:'https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=900&q=80',
+ skeleton:'https://images.unsplash.com/photo-1535338454770-8be927b5a00b?auto=format&fit=crop&w=900&q=80'
+};
+// თითოეული კითხვა: ტექსტი, პასუხი, განმარტება, თემის გასაღები
+const banks=[
+[
+['რა არის ორგანიზმების კლასიფიკაცია?','ორგანიზმების მსგავსებისა და განსხვავებების მიხედვით ჯგუფებად დაყოფა.','კლასიფიკაცია ცოცხალი სამყაროს მოწესრიგებულად შესწავლაში გვეხმარება.','animal'],
+['დაასახელე ცოცხალი ორგანიზმების ოთხი ძირითადი ჯგუფი, რომლებსაც ამ თემაში ვსწავლობთ.','ბაქტერიები, სოკოები, მცენარეები და ცხოველები.','ეს ჯგუფები ერთმანეთისგან აგებულებითა და კვების თავისებურებებით განსხვავდებიან.','animal'],
+['რა არის ფოტოსინთეზი?','პროცესი, რომლის დროსაც მცენარე სინათლის დახმარებით თავად წარმოქმნის საკვებს.','ფოტოსინთეზისთვის მცენარეს სჭირდება სინათლე, წყალი და ნახშირორჟანგი.','plant'],
+['რომელი ორგანო იწოვს წყალს ნიადაგიდან?','ფესვი.','ფესვი მცენარეს ნიადაგში ამაგრებს და წყალსა და მინერალურ ნივთიერებებს იწოვს.','plant'],
+['რა ფუნქცია აქვს ჩონჩხს?','სხეულს აძლევს საყრდენსა და ფორმას, იცავს ორგანოებს და მონაწილეობს მოძრაობაში.','ძვლები კუნთებთან ერთად მოძრაობას უზრუნველყოფს, ზოგი ძვალი კი ორგანოებს იცავს.','skeleton'],
+['რა არის უხერხემლო ცხოველის მთავარი ნიშანი?','ხერხემალი არ აქვს.','პეპელა, ობობა და ლოკოკინა უხერხემლო ცხოველების მაგალითებია.','animal']
+],
+[
+['ძალიან პატარა ვარ და ხშირად მხოლოდ მიკროსკოპით დამინახავ. ვინ ვარ?','ბაქტერია.','ბაქტერიები უმეტესად მიკროსკოპული, ერთუჯრედიანი ორგანიზმებია.','bacteria'],
+['ტყეში შეიძლება შემხვდე. ზოგჯერ ქუდი და ფეხი მაქვს. ვინ ვარ?','ქუდიანი სოკო.','ქუდი და ფეხი სოკოს ზოგი სახეობის ხილული ნაწილია.','fungi'],
+['ჩემი ფოთლები ნემსებს ჰგავს, თესლი კი გირჩაში ვითარდება. ვინ ვარ?','წიწვოვანი მცენარე.','ფიჭვი და ნაძვი წიწვოვანი მცენარეების მაგალითებია.','forest'],
+['ყვავილს ვქმნი, ხოლო ჩემი თესლი ნაყოფში ვითარდება. ვინ ვარ?','ყვავილოვანი მცენარე.','ყვავილოვანი მცენარეების დამახასიათებელი ნიშანია ყვავილის წარმოქმნა.','flower'],
+['წყალში ვცხოვრობ, ფარფლებით ვცურავ და ლაყუჩებით ვსუნთქავ. ვინ ვარ?','თევზი.','თევზების უმეტესობა წყალში ცხოვრობს და ლაყუჩებით სუნთქავს.','fish'],
+['პატარა მწერი ვარ, ფერადი ფრთები მაქვს და ყვავილებთან ხშირად დამინახავ. ვინ ვარ?','პეპელა.','პეპელა მწერია და უხერხემლო ცხოველებს მიეკუთვნება.','animal']
+],
+[
+['ტყეში უცნობი სოკო იპოვე. როგორ უნდა მოიქცე?','არ უნდა გასინჯო; უნდა აცნობო უფროსს.','ზოგი სოკო შხამიანია. უცნობი სოკოს გასინჯვა ჯანმრთელობისთვის საშიშია.','fungi'],
+['მცენარეს ფოთლები დაუჭკნა. რა შეიძლება სჭირდებოდეს?','შესაძლოა წყალი, სინათლე ან შესაბამისი მოვლა.','მცენარის მდგომარეობაზე წყალი, სინათლე, ტემპერატურა და სხვა პირობები მოქმედებს.','plant'],
+['პარკში ნაგავი დაინახე. როგორ შეგიძლია დაეხმარო ბუნებას?','ნაგავი შესაბამის ურნაში უნდა მოვათავსო და სხვებსაც მოვუწოდო სისუფთავისკენ.','ნარჩენები აბინძურებს გარემოს და საფრთხეს უქმნის ცოცხალ ორგანიზმებს.','forest'],
+['აკვარიუმში თევზი წყლის ზედაპირთან ხშირად ამოდის. რა უნდა შეამოწმოს უფროსმა?','წყლის სისუფთავე და ჟანგბადის საკმარისი რაოდენობა.','თევზებს წყალში გახსნილი ჟანგბადი სჭირდებათ.','fish'],
+['მცენარე ბნელ კარადაში მოათავსეს. რა შეიძლება დაემართოს?','სინათლის ნაკლებობის გამო მისი ზრდა და მდგომარეობა გაუარესდება.','სინათლე ფოტოსინთეზისთვის აუცილებელია.','plant']
+],
+[
+['ყველა ბაქტერია მავნეა.','არასწორია.','არსებობს სასარგებლო ბაქტერიებიც; ყველა ბაქტერია დაავადებას არ იწვევს.','bacteria'],
+['სოკოები მცენარეების ჯგუფს მიეკუთვნებიან.','არასწორია.','სოკოები ცოცხალი ორგანიზმების დამოუკიდებელი ჯგუფია.','fungi'],
+['ხერხემლიან ცხოველებს ხერხემალი აქვთ.','სწორია.','ხერხემალი მათი ჩონჩხის მნიშვნელოვანი ნაწილია.','skeleton'],
+['დელფინი თევზია, რადგან წყალში ცხოვრობს.','არასწორია.','დელფინი ძუძუმწოვარია: ის ფილტვებით სუნთქავს და ნაშიერს რძით კვებავს.','fish'],
+['ყველა მცენარეს ყვავილი აქვს.','არასწორია.','არსებობს მცენარეები, რომლებიც ყვავილს არ წარმოქმნიან, მაგალითად ბევრი ხავსი და გვიმრა.','plant'],
+['სოკოები მკვდარი ნარჩენების დაშლაში მონაწილეობენ.','სწორია.','ბევრი სოკო შლის მკვდარ ორგანულ მასალას და ნივთიერებების გარემოში დაბრუნებას უწყობს ხელს.','fungi']
+],
+[
+['დაასახელეთ ორი განსხვავება წიწვოვან და ყვავილოვან მცენარეებს შორის.','წიწვოვანებს ხშირად ნემსისებრი ფოთლები და გირჩები აქვთ; ყვავილოვნებს — ყვავილი და ნაყოფი.','შედარებისას ყურადღება მიაქციეთ ფოთლებს, ყვავილსა და თესლის განვითარებას.','flower'],
+['აუხსენით უმცროს მოსწავლეს, რა განსხვავებაა ხერხემლიან და უხერხემლო ცხოველებს შორის.','ხერხემლიანებს აქვთ ხერხემალი, უხერხემლოებს კი — არა.','განმარტებას დაურთეთ მაგალითები: ძაღლი და პეპელა.','skeleton'],
+['რატომ არიან სოკოები ბუნებისთვის მნიშვნელოვანი?','ისინი შლიან მკვდარ ორგანულ ნარჩენებს და ნივთიერებათა წრებრუნვაში მონაწილეობენ.','დაშლის შედეგად ნივთიერებები გარემოში ბრუნდება და სხვა ორგანიზმებისთვის ხელმისაწვდომი ხდება.','fungi'],
+['შეადარეთ ფესვისა და ფოთლის ფუნქციები.','ფესვი წყალსა და მინერალურ ნივთიერებებს იწოვს; ფოთოლში ძირითადად ფოტოსინთეზი მიმდინარეობს.','მცენარის სხვადასხვა ორგანო განსხვავებულ, მაგრამ ერთმანეთთან დაკავშირებულ საქმეს ასრულებს.','plant'],
+['დაასახელეთ ხერხემლიანების ხუთი ძირითადი ჯგუფი.','თევზები, ამფიბიები, ქვეწარმავლები, ფრინველები და ძუძუმწოვრები.','ეს ჯგუფები სხეულის აგებულებითა და ცხოვრების წესით განსხვავდებიან.','animal']
+],
+[
+['დაასახელეთ ერთი ხერხემლიანი და ერთი უხერხემლო ცხოველი.','მაგალითად: ძაღლი და პეპელა.','ძაღლს აქვს ხერხემალი, პეპელას კი — არა.','animal'],
+['მოიფიქრეთ ერთი საინტერესო კითხვა მცენარეების შესახებ სხვა გუნდისთვის.','მისაღებია ნებისმიერი სწორი და თემასთან დაკავშირებული კითხვა.','კითხვა უნდა იყოს გასაგები და პასუხის გაცემას შესწავლილი მასალა უნდა ეხმარებოდეს.','plant'],
+['დაასახელეთ სოკოს გამოყენების ერთი მაგალითი.','საკვებად გამოყენება ან ზოგი მედიკამენტის წარმოება.','ზოგი სოკო ადამიანს საკვებისა და მედიცინის სფეროში ეხმარება.','fungi'],
+['დაასახელეთ ერთი გზა, რომლითაც შეგიძლიათ ბუნების დაცვა.','მაგალითად: ნაგვის ურნაში მოთავსება, ხეების მოვლა ან წყლის დაზოგვა.','პატარა ყოველდღიური ქმედებებიც გარემოს დაცვას უწყობს ხელს.','forest'],
+['მოიფიქრეთ ერთი მინიშნება, რომლითაც სხვა გუნდმა უნდა გამოიცნოს თევზი.','მაგალითად: „წყალში ვცხოვრობ და ლაყუჩებით ვსუნთქავ“.','კარგი მინიშნება ორგანიზმის დამახასიათებელ ნიშანს აღწერს.','fish']
+],
+[
+['ბონუსი! დაასახელეთ ორი წიწვოვანი მცენარე.','ფიჭვი და ნაძვი.','ორივე წიწვოვანი მცენარეა.','forest'],
+['ბონუსი! დაასახელეთ ორი უხერხემლო ცხოველი.','პეპელა და ჭიანჭველა.','უხერხემლოებს ხერხემალი არ აქვთ.','animal'],
+['ბონუსი! რომელი ორგანო იცავს ადამიანის ტვინს?','თავის ქალა.','თავის ქალა ტვინის დამცავი ძვლოვანი ნაწილია.','skeleton'],
+['ბონუსი! დაასახელეთ ერთი სასარგებლო ბაქტერიის გამოყენება.','მაგალითად, იოგურტის დამზადებაში მონაწილეობა.','ზოგი ბაქტერია რძის პროდუქტების დამზადებაში გამოიყენება.','bacteria'],
+['ბონუსი! დაასახელეთ მცენარის სამი ძირითადი ორგანო.','ფესვი, ღერო და ფოთოლი.','ამ ორგანოებს მცენარის ზრდასა და სიცოცხლეში მნიშვნელოვანი ფუნქციები აქვთ.','plant']
+]
+];
+let teams=[],current=0,pendingTeam=null,pendingQuestion=null,timerValue=30,timerInterval=null,rollInterval=null;
+const special={5:'lift',11:'banana',18:'chest'};
+const cellCats=[0,1,2,3,4,5,6,0,2,1,3,4,5,6,0,1,2,3,4,5,6,0,2,1,3,4,5,6,0,0];
+const matches=[['🐶','ძაღლი','ხერხემლიანი'],['🦋','პეპელა','უხერხემლო'],['🐟','თევზი','ხერხემლიანი'],['🐌','ლოკოკინა','უხერხემლო'],['🐸','ბაყაყი','ხერხემლიანი'],['🐜','ჭიანჭველა','უხერხემლო'],['🐬','დელფინი','ხერხემლიანი'],['🕷️','ობობა','უხერხემლო']];
+let matchIndex=0,matchPoints=0,matchDone=false;
+
+function page(id,btn){
+ document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+ document.getElementById(id).classList.add('active');
+ document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));
+ if(btn)btn.classList.add('active');
+ else [...document.querySelectorAll('nav button')].find(x=>x.textContent.includes(id==='home'?'მთავარი':id==='knowledge'?'ცოდნის':id==='rules'?'წესები':id==='game'?'თამაში':'ჯილდოები'))?.classList.add('active');
+ if(id==='scores')renderScores();
+ window.scrollTo({top:0,behavior:'smooth'});
+}
+function safe(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function addTeam(){
+ if(teams.length>=8)return alert('მაქსიმუმ 8 გუნდის დამატებაა შესაძლებელი.');
+ let name=document.getElementById('teamName').value.trim()||'გუნდი '+(teams.length+1);
+ if(teams.some(t=>t.name.toLowerCase()===name.toLowerCase()))return alert('ასეთი სახელი უკვე გამოყენებულია. აირჩიეთ სხვა სახელი.');
+ teams.push({name,animal:document.getElementById('animal').value,color:colors[teams.length],score:0,pos:0,streak:0,mushrooms:0,double:false,badges:[],correct:0});
+ document.getElementById('teamName').value='';renderAll();
+}
+function renderTeams(){
+ document.getElementById('teamCount').textContent='გუნდები: '+teams.length+' / 8';
+ document.getElementById('teams').innerHTML=teams.map((t,i)=>`<span class="team-pill ${i===current?'current':''}" style="border-color:${t.color}">${i===current?'▶ ':''}${t.animal} ${safe(t.name)} · ${t.score} ქ.</span>`).join('');
+ document.getElementById('turnText').textContent=teams.length?'ახლა თამაშობს: '+teams[current].name:'ჯერ დაამატეთ გუნდები.';
+}
+function renderBoard(){
+ let board=document.getElementById('board');board.innerHTML='';
+ for(let i=0;i<30;i++){
+  let c=document.createElement('div'),type=special[i];
+  c.className='cell '+(i===0?'start':i===29?'finish':categories[cellCats[i]][1])+(type?' special':'');
+  let pawns=teams.filter(t=>t.pos===i).map(t=>`<span class="pawn" title="${safe(t.name)}">${t.animal}</span>`).join(' ');
+  let specialText=type==='lift'?'🚀 ლიფტი':type==='banana'?'🍌 ქერქი':type==='chest'?'🎁 სკივრი':'';
+  c.innerHTML=`<b>${i===0?'🏁':i===29?'🏆':i+1}</b><small>${i===0?'დაწყება':i===29?'ფინიში':specialText||categories[cellCats[i]][0]}</small><div class="pawns">${pawns}</div>`;
+  board.appendChild(c);
+ }
+}
+function renderBadges(){
+ let all=teams.flatMap(t=>t.badges.map(b=>t.name+': '+b));
+ document.getElementById('badges').innerHTML=all.length?all.map(b=>`<span class="badge">🏅 ${safe(b)}</span>`).join(''):'<span class="muted">ჯერ ბეჯები არ მოგიპოვებიათ.</span>';
+}
+function renderAll(){renderTeams();renderBoard();renderBadges();renderScores()}
+function changeTheme(){
+ let v=document.getElementById('theme').value;
+ document.querySelector('.board-wrap').style.background=v==='ocean'?'linear-gradient(135deg,#ccecf2,#d8f4ee)':v==='lab'?'linear-gradient(135deg,#e7ddfa,#e6f2fa)':'linear-gradient(135deg,#dff0db,#fff3d9)';
+}
+function sound(freq=550,duration=.12){
+ if(!document.getElementById('soundOn').checked)return;
+ try{let ctx=new(window.AudioContext||window.webkitAudioContext)(),o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.value=freq;g.gain.value=.05;o.start();o.stop(ctx.currentTime+duration)}catch(e){}
+}
+function confetti(){
+ let box=document.getElementById('confetti');
+ for(let i=0;i<45;i++){let x=document.createElement('span');x.className='conf';x.textContent=['🎉','⭐','✨','🌿','🎊'][Math.floor(Math.random()*5)];x.style.left=Math.random()*100+'%';x.style.animationDelay=Math.random()*.8+'s';box.appendChild(x);setTimeout(()=>x.remove(),3500)}
+}
+function rollDice(){
+ if(!teams.length)return alert('ჯერ დაამატეთ გუნდები.');
+ if(pendingTeam!==null)return alert('ჯერ შეაფასეთ მიმდინარე დავალება.');
+ if(rollInterval)return;
+ let t=teams[current],n=Math.floor(Math.random()*6)+1;
+ document.getElementById('dice').textContent=['⚀','⚁','⚂','⚃','⚄','⚅'][n-1];sound(300+n*80,.2);
+ let start=t.pos,target=Math.min(29,start+n),step=0;
+ rollInterval=setInterval(()=>{t.pos=Math.min(target,start+ ++step);renderBoard();if(t.pos>=target){clearInterval(rollInterval);rollInterval=null;setTimeout(()=>landOnCell(t),250)}},180);
+}
+function landOnCell(t){
+ if(t.pos===29){confetti();sound(900,.4)}
+ if(special[t.pos]==='lift'){t.pos=Math.min(29,t.pos+2);alert('🚀 სწრაფი ლიფტი! ორი უჯრით წინ!')}
+ if(special[t.pos]==='banana'){t.pos=Math.max(0,t.pos-1);alert('🍌 ბანანის ქერქი! ერთი უჯრით უკან!')}
+ if(special[t.pos]==='chest'){t.double=true;alert('🎁 საიდუმლო სკივრი! შემდეგ სწორ პასუხზე ორმაგ ქულას მიიღებთ.')}
+ renderBoard();
+ let cat=cellCats[t.pos],bank=banks[cat];
+ pendingTeam=current;pendingQuestion=bank[Math.floor(Math.random()*bank.length)];
+ document.getElementById('categoryLabel').textContent=categories[cat][2]+' '+categories[cat][0];
+ document.getElementById('questionTitle').textContent=t.animal+' '+t.name+' — თქვენი დავალება';
+ document.getElementById('questionText').textContent=pendingQuestion[0];
+ document.getElementById('answerText').textContent=pendingQuestion[1];
+ document.getElementById('explanationText').textContent=pendingQuestion[2];
+ let picture=img[pendingQuestion[3]];let imageEl=document.getElementById('questionImage');
+ if(picture){imageEl.src=picture;imageEl.style.display='block'}else imageEl.style.display='none';
+ document.getElementById('answerBox').style.display='none';document.getElementById('questionModal').classList.add('show');resetTimer();
+}
+function revealAnswer(){document.getElementById('answerBox').style.display='block'}
+function award(points){
+ if(pendingTeam===null)return;
+ let t=teams[pendingTeam];
+ if(points>0){
+  let actual=t.double?points*2:points;t.score+=actual;t.correct++;t.streak++;
+  if(pendingQuestion[3]==='fungi')t.mushrooms++;
+  if(t.mushrooms>=3&&!t.badges.includes('🍄 სოკოების ექსპერტი')){t.badges.push('🍄 სოკოების ექსპერტი');confetti()}
+  if(t.streak>=3&&!t.badges.includes('⚡ სწრაფი მოაზროვნე')){t.badges.push('⚡ სწრაფი მოაზროვნე');confetti()}
+  if(!t.badges.includes('🌟 პირველი სწორი პასუხი'))t.badges.push('🌟 პირველი სწორი პასუხი');
+  confetti();sound(750,.25);
+ }else t.streak=0;
+ t.double=false;stopTimer();closeModal();renderAll();
+ if(t.pos===29){confetti();alert('გილოცავთ! '+t.name+' ფინიშს მიაღწია! 🏆')}
+}
+function closeModal(){document.getElementById('questionModal').classList.remove('show');pendingTeam=null;pendingQuestion=null;stopTimer()}
+function nextTurn(){
+ if(!teams.length)return;
+ if(pendingTeam!==null||rollInterval)return alert('ჯერ მიმდინარე სვლა და დავალება დაასრულეთ.');
+ current=(current+1)%teams.length;renderTeams();
+}
+function resetGame(){
+ if(!confirm('თამაშის თავიდან დაწყება გსურთ?'))return;
+ clearInterval(rollInterval);rollInterval=null;
+ teams.forEach(t=>{t.score=0;t.pos=0;t.streak=0;t.mushrooms=0;t.double=false;t.badges=[];t.correct=0});
+ current=0;closeModal();resetTimer();renderAll();
+}
+function startTimer(){
+ if(timerInterval)return;
+ timerInterval=setInterval(()=>{timerValue--;updateTimer();if(timerValue<=0){stopTimer();sound(180,.5);alert('⏰ დრო ამოიწურა!')}},1000);
+}
+function stopTimer(){clearInterval(timerInterval);timerInterval=null}
+function resetTimer(){stopTimer();timerValue=30;updateTimer()}
+function updateTimer(){let s='00:'+String(Math.max(0,timerValue)).padStart(2,'0');document.getElementById('timer').textContent=s;document.getElementById('questionTimer').textContent=s}
+function renderScores(){
+ let box=document.getElementById('scoreBoard');if(!box)return;
+ if(!teams.length){box.innerHTML='<div class="card">ჯერ გუნდები არ დამატებულა.</div>';return}
+ let sorted=[...teams].sort((a,b)=>b.score-a.score);
+ box.innerHTML=sorted.map((t,i)=>`<div class="score-card" style="--c:${t.color}"><h3>${i===0?'🏆 ':''}${t.animal} ${safe(t.name)}</h3><div class="score">${t.score}</div><b>ქულა</b><p>გავლილი უჯრები: ${t.pos+1}/30</p><p>სწორი პასუხები: ${t.correct}</p><p>მიღწევები: ${t.badges.length}</p><div class="progress"><span style="width:${(t.pos+1)/30*100}%"></span></div></div>`).join('');
+}
+function makeCertificate(){
+ let name=document.getElementById('certName').value.trim();if(!name)return alert('ჩაწერეთ გუნდის სახელი.');
+ let t=teams.find(x=>x.name.toLowerCase()===name.toLowerCase());if(!t)return alert('ასეთი გუნდი ვერ მოიძებნა. შეამოწმეთ გუნდის სახელი.');
+ document.getElementById('certificateArea').innerHTML=`<div class="certificate"><div style="font-size:55px">🏆🌿🎓</div><h2>ახალგაზრდა ბიოლოგის სერტიფიკატი</h2><p style="font-size:19px">გადაეცემა გუნდს</p><h2>${safe(name)}</h2><p>ორგანიზმების საიდუმლოებების თავგადასავალში მონაწილეობისთვის!</p><p>მიღწეული ქულა: <b>${t.score}</b></p><p>თარიღი: ${new Date().toLocaleDateString('ka-GE')}</p><div style="font-size:38px">🌱 🦋 🍄 🦁</div><p>გილოცავთ, ახალგაზრდა მკვლევრებო!</p></div><div class="controls"><button class="primary" onclick="window.print()">🖨️ სერტიფიკატის ამობეჭდვა</button></div>`;
+}
+function showMatch(){let m=matches[matchIndex];document.getElementById('matchAnimal').textContent=m[0];document.getElementById('matchName').textContent=m[1];matchDone=false}
+function matchAnswer(ans){
+ if(matchDone)return;matchDone=true;let correct=matches[matchIndex][2]===ans;
+ if(correct){matchPoints++;document.getElementById('matchFeedback').textContent='🎉 სწორია! ყოჩაღ!';confetti();sound(700,.2)}
+ else document.getElementById('matchFeedback').textContent='ამჯერად ვერ გამოიცანი. სწორი პასუხია: '+matches[matchIndex][2]+'. გაიხსენე, აქვს თუ არა ცხოველს ხერხემალი.';
+ document.getElementById('matchScore').textContent='სწორი პასუხები: '+matchPoints;
+}
+function nextMatch(){matchIndex=(matchIndex+1)%matches.length;showMatch();document.getElementById('matchFeedback').textContent='აირჩიე შესაბამისი ჯგუფი.'}
+showMatch();renderAll();updateTimer();
+</script>
+</body>
+</html>'''
+
+# Fix deliberately invalid placeholder image URLs with valid generic Unsplash images.
+html = html.replace(
+    "https://images.unsplash.com/photo-150 levi?auto=format&fit=crop&w=700&q=80",
+    "https://images.unsplash.com/photo-1472396961693-142e6e269027?auto=format&fit=crop&w=700&q=80"
+).replace(
+    "https://images.unsplash.com/photo-150 animal?auto=format&fit=crop&w=700&q=80",
+    "https://images.unsplash.com/photo-1472396961693-142e6e269027?auto=format&fit=crop&w=700&q=80"
+)
+out = Path("/mnt/data/organizmების_saidumლოებები.html")
+out.write_text(html, encoding="utf-8")
+print(out, out.stat().st_size)
